@@ -37,5 +37,8 @@ src/Diffusyn.DiffusynServer/Diffusyn.DiffusynServer/logs/
 /MvcMusicStore-Completed/Backup
 /MvcMusicStore-Completed/Backup1
 /.vs
-/Reference/RefAspNetCoreApp
-/MvcMusicStore-Core/MvcMusicStore
+/ReferenceProj/FullNetCoreApp/FullNetCoreApp
+/ReferenceProj/FullNetCoreApp/.vs/FullNetCoreApp/v15/Server/sqlite3
+/.gitattributes
+/ReferenceProj/FullNetCoreApp
+/MvcMusicStore-Core/MvcMusicStore/.vs
