@@ -37,3 +37,5 @@ src/Diffusyn.DiffusynServer/Diffusyn.DiffusynServer/logs/
 /MvcMusicStore-Completed/Backup
 /MvcMusicStore-Completed/Backup1
 /.vs
+/Reference/RefAspNetCoreApp
+/MvcMusicStore-Core/MvcMusicStore
