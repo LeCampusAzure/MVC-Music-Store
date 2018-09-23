@@ -1,6 +1,12 @@
-MVC Music Store tutorial for ASP.NET MVC 3 Tools Update - v3.0 release of this tutorial
 
-The code and tutorial can be downloaded from http://mvcmusicstore.codeplex.com/
+LATEST UPDATE
+-------------
+Application in folder MvcMusicStore-Completed rebuild by Marius Zaharia on the latest Visual Studio tooling (2017 Build 15.8.4). 
+--------------
+
+
+
+MVC Music Store tutorial for ASP.NET MVC 3 Tools Update - v3.0 release of this tutorial
 
 The code for this project is available under the Microsoft Public License (Ms-PL). The tutorial document is licensed under Creative Commons Attribution 3.0 License.
 
