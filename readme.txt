@@ -1,7 +1,8 @@
 
 LATEST UPDATE
 -------------
-Application in folder MvcMusicStore-Completed rebuild by Marius Zaharia on the latest Visual Studio tooling (2017 Build 15.8.4). 
+Application in folder MvcMusicStore-1-AspNet rebuild by Marius Zaharia on the latest Visual Studio tooling (2017 Build 15.8.4). 
+The other builds in the next folders are moved to ASPNET Core. 
 --------------
 
 
