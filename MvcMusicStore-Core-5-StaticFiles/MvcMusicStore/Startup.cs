@@ -30,7 +30,7 @@ namespace MvcMusicStore
 
             services.Configure<CookiePolicyOptions>(options =>
             {
-                options.CheckConsentNeeded = context => true;
+                //options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
@@ -65,12 +65,11 @@ namespace MvcMusicStore
 
             var blobOptions = new AzureBlobOptions
             {
-                ConnectionString = "DefaultEndpointsProtocol=https;AccountName=pkt0musicstore0test0stg;AccountKey=lsWGg2OJq1Ll1pUL03wFY3fXR/jTC2nM5X5UicPjhrEjcXwETTjwJGQOi+Qlz6xuOVCcF2iL19qDJTzmksuNmQ==;EndpointSuffix=core.windows.net",
+                ConnectionString = Configuration.GetConnectionString("AzureStorageStaticFiles"),
                 DocumentContainer = "wwwroot"
             };
             var azureBlobFileProvider = new AzureBlobFileProvider(blobOptions);
-                    services.AddSingleton(azureBlobFileProvider);
-
+            services.AddSingleton(azureBlobFileProvider);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -88,8 +87,8 @@ namespace MvcMusicStore
             }
 
             app.UseHttpsRedirection();
-            var blobFileProvider = app.ApplicationServices.GetRequiredService<AzureBlobFileProvider>();
             //app.UseStaticFiles();
+            var blobFileProvider = app.ApplicationServices.GetRequiredService<AzureBlobFileProvider>();
             app.UseStaticFiles(new StaticFileOptions()
             {
                 FileProvider = blobFileProvider,
@@ -104,8 +103,6 @@ namespace MvcMusicStore
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-
-
         }
     }
 }
