@@ -25,6 +25,8 @@
   <ItemGroup>
     <Compile Remove="Controllers\AccountController-old.cs" />
     <Compile Remove="Controllers\AccountController.cs" />
+    <Compile Remove="Models\ApplicationDbContext.cs" />
+    <Compile Remove="Models\ApplicationUser.cs" />
   </ItemGroup>
 
   <ItemGroup>
