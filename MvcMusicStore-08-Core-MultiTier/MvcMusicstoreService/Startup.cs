@@ -33,7 +33,6 @@ namespace MvcMusicstoreService
               .UseSqlServer(Configuration.GetConnectionString("MusicStoreEntities")
               ));
 
-            services.AddScoped<ShoppingCart, ShoppingCart>();
             services.AddMvc().AddJsonOptions(opt =>
             {
                 opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
