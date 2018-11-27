@@ -46,7 +46,11 @@ namespace MvcMusicStore
             {
                 o.Configuration = Configuration.GetConnectionString("RedisCache");
             });
-            services.AddMvc();
+            services.AddMvc().AddJsonOptions(opt =>
+            {
+                opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                opt.SerializerSettings.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
+            });
 
             services.AddHttpContextAccessor();
 

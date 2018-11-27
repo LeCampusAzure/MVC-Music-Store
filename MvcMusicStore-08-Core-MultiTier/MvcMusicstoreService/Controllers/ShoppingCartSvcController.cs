@@ -12,40 +12,46 @@ namespace MvcMusicstoreService.Controllers
     public class ShoppingCartSvcController : ControllerBase
     {
         MusicStoreEntities storeDB;
-        ShoppingCart shoppingCart;
 
-        public ShoppingCartSvcController(MusicStoreEntities _storeDB, ShoppingCart _shoppingCart)
+        public ShoppingCartSvcController(MusicStoreEntities _storeDB)
         {
             storeDB = _storeDB;
-            shoppingCart = _shoppingCart;
         }
 
         //
         // GET: /ShoppingCart/CartItems
         [HttpGet]
-        public ActionResult<List<Cart>> CartItems(int id)
+        public ActionResult<List<Cart>> CartItems(string id)
         {
-            return shoppingCart.GetCartItems();
+            return new ShoppingCart(storeDB, id).GetCartItems();
         }
 
         // GET: /ShoppingCart/Total
         [HttpGet]
-        public ActionResult<decimal> Total(int id)
+        public ActionResult<decimal> Total(string id)
         {
-            return shoppingCart.GetTotal();
+            return new ShoppingCart(storeDB, id).GetTotal();
         }
 
 
         // GET: /ShoppingCart/Count
         [HttpGet]
-        public ActionResult<int> Count(int id)
+        public ActionResult<int> Count(string id)
         {
-            return shoppingCart.GetCount();
+            return new ShoppingCart(storeDB, id).GetCount();
         }
 
         //
-        // GET: /Store/AddToCart/5
+     
 
+        [HttpPost]
+        public ActionResult MigrateCart(CartMigration cartMigration)
+        {
+            new ShoppingCart(storeDB, cartMigration.SourceCartId).MigrateCart(cartMigration.DestCartId);
+            return Ok();
+        }
+
+        // GET: /Store/AddToCart/5
         [HttpPost]
         public ActionResult AddToCart(Cart cart)
         {
@@ -55,7 +61,7 @@ namespace MvcMusicstoreService.Controllers
                 .Single(album => album.AlbumId == cart.AlbumId);
 
             // Add it to the shopping cart
-            shoppingCart.AddToCart(addedAlbum);
+            new ShoppingCart(storeDB, cart.CartId).AddToCart(addedAlbum);
 
             // Go back to the main store page for more shopping
             return Ok();
@@ -67,8 +73,17 @@ namespace MvcMusicstoreService.Controllers
         public ActionResult<int> RemoveFromCart(Cart cart)
         {
             // Remove the item from the cart
-            int itemCount = shoppingCart.RemoveFromCart(cart.RecordId);
+            int itemCount = new ShoppingCart(storeDB, cart.CartId).RemoveFromCart(cart.RecordId);
             return itemCount;
         }
+
+
+        [HttpPost]
+        public ActionResult EmptyCart([FromBody] string cartId)
+        {
+            new ShoppingCart(storeDB, cartId).EmptyCart();
+            return Ok();
+        }
+
     }
 }

@@ -18,7 +18,7 @@ namespace MvcMusicStore.Controllers
 
         public StoreController(IConfiguration _config)
         {
-            apiHelper = new ApiHelper(_config);
+            apiHelper = new ApiHelper(_config.GetValue<string>("Services:MvcMusicStoreService"));
         }
         //
         // GET: /Store/

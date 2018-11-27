@@ -17,10 +17,11 @@ namespace MvcMusicStore.Controllers
 
         public HomeController(IConfiguration _config)
         {
-            apiHelper = new ApiHelper(_config);
+            apiHelper = new ApiHelper(_config.GetValue<string>("Services:MvcMusicStoreService"));
         }
         public async Task<ActionResult> Index()
         {
+
             // Get most popular albums
             var albums = await apiHelper.GetAsync<List<Album>>("/api/Store/TopSellingAlbums?count=5");
             return View(albums);

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -12,20 +13,35 @@ namespace MvcMusicStore.Helpers
 {
     public class ApiHelper
     {
-        IConfiguration config;
-        string connStringName = "MvcMusicStoreService";
+        string baseUri;
 
-        public ApiHelper(IConfiguration _config)
+        public ApiHelper(string _baseUri)
         {
-            config = _config;
+            baseUri = _baseUri;
         }
 
 
         public async Task<V> PostAsync<T,V>(string apiAddress, T value)
         {
             var client = new HttpClient();
-            client.BaseAddress = new Uri(config.GetConnectionString(connStringName));
-            var response = await client.PostAsJsonAsync(apiAddress, value);
+            client.BaseAddress = new Uri(baseUri);
+
+            string valueString = string.Empty;
+            if (!(value is string))
+            {
+                var settings = new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    PreserveReferencesHandling = PreserveReferencesHandling.Objects
+                };
+                valueString = JsonConvert.SerializeObject(value, settings);
+            }
+            else
+            {
+                valueString = value as string;
+            }
+            StringContent content = new StringContent(valueString, Encoding.UTF8, "application/json");
+            var response = await client.PostAsync(apiAddress, content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -33,7 +49,7 @@ namespace MvcMusicStore.Helpers
             }
             else
             {
-                throw new Exception("Cannot get response from the API");
+                throw new Exception("Cannot get response from the API: response status " + response.StatusCode);
             }
 
         }
@@ -42,8 +58,23 @@ namespace MvcMusicStore.Helpers
         public async Task PostAsync<T>(string apiAddress, T value)
         {
             var client = new HttpClient();
-            client.BaseAddress = new Uri(config.GetConnectionString(connStringName));
-            var response = await client.PostAsJsonAsync(apiAddress, value);
+            client.BaseAddress = new Uri(baseUri);
+            string valueString = string.Empty;
+            if (!(value is string))
+            {
+                var settings = new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    PreserveReferencesHandling = PreserveReferencesHandling.Objects
+                };
+                valueString = JsonConvert.SerializeObject(value, settings);
+            }
+            else
+            {
+                valueString = value as string;
+            }
+            StringContent content = new StringContent(valueString, Encoding.UTF8, "application/json");
+            var response = await client.PostAsync(apiAddress, content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -51,7 +82,7 @@ namespace MvcMusicStore.Helpers
             }
             else
             {
-                throw new Exception("Cannot get response from the API");
+                throw new Exception("Cannot get response from the API: response status " + response.StatusCode);
             }
 
         }
@@ -60,7 +91,7 @@ namespace MvcMusicStore.Helpers
         public async Task<T> GetAsync<T>(string apiAddress)
         {
             var client = new HttpClient();
-            client.BaseAddress = new Uri(config.GetConnectionString(connStringName));
+            client.BaseAddress = new Uri(baseUri);
             var response = await client.GetAsync(apiAddress);
 
             if (response.IsSuccessStatusCode)
@@ -70,7 +101,7 @@ namespace MvcMusicStore.Helpers
             }
             else
             {
-                throw new Exception("Cannot get response from the API");
+                throw new Exception("Cannot get response from the API: response status " + response.StatusCode);
             }
 
         }
@@ -78,7 +109,7 @@ namespace MvcMusicStore.Helpers
         public T Get<T>(string apiAddress)
         {
             var client = new HttpClient();
-            client.BaseAddress = new Uri(config.GetConnectionString(connStringName));
+            client.BaseAddress = new Uri(baseUri);
             var response = Task.Run(() => client.GetAsync(apiAddress)).Result;
             if (response.IsSuccessStatusCode)
             {
@@ -86,7 +117,7 @@ namespace MvcMusicStore.Helpers
             }
             else
             {
-                throw new Exception("Cannot get response from the API");
+                throw new Exception("Cannot get response from the API: response status " + response.StatusCode);
             }
 
         }
@@ -95,7 +126,7 @@ namespace MvcMusicStore.Helpers
         public async Task DeleteAsync(string apiAddress, int id)
         {
             var client = new HttpClient();
-            client.BaseAddress = new Uri(config.GetConnectionString(connStringName));
+            client.BaseAddress = new Uri(baseUri);
             var response = await client.DeleteAsync(apiAddress + "/" + id);
 
             if (response.IsSuccessStatusCode)
@@ -104,7 +135,7 @@ namespace MvcMusicStore.Helpers
             }
             else
             {
-                throw new Exception("Cannot get response from the API");
+                throw new Exception("Cannot get response from the API: response status " + response.StatusCode);
             }
 
         }

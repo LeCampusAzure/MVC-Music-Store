@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using MusicStore.Models;
 using MvcMusicStore.Helpers;
 using MvcMusicStore.Models;
 
@@ -20,7 +22,7 @@ namespace MvcMusicStore.Controllers
 
         public CheckoutController(IConfiguration _config)
         {
-            apiHelper = new ApiHelper(_config);
+            apiHelper = new ApiHelper(_config.GetValue<string>("Services:MvcMusicStoreService"));
         }
 
        
@@ -46,25 +48,29 @@ namespace MvcMusicStore.Controllers
                 }
                 else
                 {
-                    order.Username = User.Identity.Name;
+                    order.Username = new ContextHelper().GetUsernameFromClaims(this.HttpContext);
                     order.OrderDate = DateTime.Now;
-
-                    #region old code
-                    //Save Order
-                    //storeDB.Orders.Add(order);
-                    //storeDB.SaveChanges();
-
-                    ////Process the order
-                    //var cart = ShoppingCart.GetCart(this.HttpContext, storeDB);
-                    //cart.CreateOrder(order);
-
-                    //return RedirectToAction("Complete",
-                    //    new { id = order.OrderId });
-                    #endregion
 
                     try
                     {
-                        int orderId = await apiHelper.PostAsync<Order, int>("/api/Checkout/AddressAndPayment", order);
+                        // get cart items
+                        var cartId = new ShoppingCartHelper(this.HttpContext).GetCartId();
+                        var cartItems = await apiHelper.GetAsync<List<Cart>>("/api/ShoppingCart/CartItems?id=" + cartId);
+                        // avoid sending unuseful data on to the service
+                        cartItems.ForEach((item) =>
+                        {
+                            item.Album.Genre = null;
+                            item.Album.Artist = null;
+                        });
+
+                        OrderCreation creation = new OrderCreation()
+                        {
+                            OrderToCreate = order,
+                            CartItems = cartItems
+                        };
+                        int orderId = await apiHelper.PostAsync<OrderCreation, int>("/api/Checkout/AddressAndPayment", creation);
+                        await apiHelper.PostAsync<string>("/api/ShoppingCart/EmptyCart", $"'{cartId}'" );
+
                         return RedirectToAction("Complete", new { id = orderId });
                     }
                     catch (Exception)
@@ -75,7 +81,7 @@ namespace MvcMusicStore.Controllers
                 }
 
             }
-            catch
+            catch (Exception)
             {
                 //Invalid - redisplay with errors
                 return View(order);
@@ -89,18 +95,19 @@ namespace MvcMusicStore.Controllers
         {
             try
             {
-                bool isValid = await apiHelper.PostAsync<int, bool>("/api/Checkout/Complete", id);
+                string username = new ContextHelper().GetUsernameFromClaims(this.HttpContext);
+                bool isValid = await apiHelper.GetAsync<bool>(string.Format("/api/Checkout/Complete?id={0}&username={1}", id, username));
                 if (isValid)
                 {
-                    int retId = id;
-                    return RedirectToAction("Complete", new { id = retId });
+                    return View(id);
                 }
-                return View("Invalid checkout");
+                ViewBag.ErrorText = "Invalid checkout, order not found in the database.";
+                return View("Error");
             }
             catch (Exception ex)
             {
-                //Log
-                return View("Error: " + ex.Message);
+                ViewBag.ErrorText = ex.Message;
+                return View("Error");
             }
 
 

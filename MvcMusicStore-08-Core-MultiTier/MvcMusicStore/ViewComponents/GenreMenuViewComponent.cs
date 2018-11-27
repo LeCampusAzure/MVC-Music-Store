@@ -16,7 +16,7 @@ namespace MvcMusicStore.ViewComponents
 
         public GenreMenu(IConfiguration _config)
         {
-            apiHelper = new ApiHelper(_config);
+            apiHelper = new ApiHelper(_config.GetValue<string>("Services:MvcMusicStoreService"));
         }
 
         public async Task<IViewComponentResult> InvokeAsync()

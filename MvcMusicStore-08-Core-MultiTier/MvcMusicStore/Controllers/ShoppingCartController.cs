@@ -15,11 +15,10 @@ namespace MvcMusicStore.Controllers
     public class ShoppingCartController : Controller
     {
         ApiHelper apiHelper;
-        public const string CartSessionKey = "CartId";
-
+        
         public ShoppingCartController(IConfiguration _config)
         {
-            apiHelper = new ApiHelper(_config);
+            apiHelper = new ApiHelper(_config.GetValue<string>("Services:MvcMusicStoreService"));
         }
 
         //
@@ -27,11 +26,12 @@ namespace MvcMusicStore.Controllers
 
         public async Task<ActionResult> Index()
         {
+            var cartId = new ShoppingCartHelper(this.HttpContext).GetCartId();
             // Set up our ViewModel
             var viewModel = new ShoppingCartViewModel
             {
-                CartItems = await apiHelper.GetAsync<List<Cart>>("/api/ShoppingCart/CartItems?cartId=" + GetCartId()),
-                CartTotal = await apiHelper.GetAsync<decimal>("/api/ShoppingCart/Total?cartId=" + GetCartId())
+                CartItems = await apiHelper.GetAsync<List<Cart>>("/api/ShoppingCart/CartItems?id=" + cartId),
+                CartTotal = await apiHelper.GetAsync<decimal>("/api/ShoppingCart/Total?id=" + cartId)
             };
 
             // Return the view
@@ -46,7 +46,7 @@ namespace MvcMusicStore.Controllers
             var cart = new Cart()
             {
                 AlbumId = id,
-                CartId = GetCartId()
+                CartId = new ShoppingCartHelper(this.HttpContext).GetCartId()
             };
             await apiHelper.PostAsync<Cart>("/api/ShoppingCart/AddToCart", cart);
             // Go back to the main store page for more shopping
@@ -58,10 +58,11 @@ namespace MvcMusicStore.Controllers
         [HttpPost]
         public async Task<ActionResult> RemoveFromCart(int id)
         {
+            var cartId = new ShoppingCartHelper(this.HttpContext).GetCartId();
             var cart = new Cart()
             {
                 RecordId = id,
-                CartId = GetCartId()
+                CartId = cartId
             };
             
             int itemCount = await apiHelper.PostAsync<Cart, int>("/api/ShoppingCart/RemoveFromCart", cart);
@@ -72,8 +73,8 @@ namespace MvcMusicStore.Controllers
             {
                 Message = HtmlEncoder.Default.Encode(albumName) +
                     " has been removed from your shopping cart.",
-                CartTotal = await apiHelper.GetAsync<decimal>("/api/ShoppingCart/Total?cartId=" + GetCartId()),
-                CartCount = await apiHelper.GetAsync<int>("/api/ShoppingCart/Count?cartId=" + GetCartId()),
+                CartTotal = await apiHelper.GetAsync<decimal>("/api/ShoppingCart/Total?id=" + cartId),
+                CartCount = await apiHelper.GetAsync<int>("/api/ShoppingCart/Count?id=" + cartId),
                 ItemCount = itemCount,
                 DeleteId = id
             };
@@ -83,28 +84,5 @@ namespace MvcMusicStore.Controllers
         }
 
 
-        private string GetCartId()
-        {
-            var context = this.HttpContext;
-            context.Session.LoadAsync().Wait();
-            if (context.Session.GetString(CartSessionKey) == null)
-            {
-                if (!string.IsNullOrWhiteSpace(context.User.Identity.Name))
-                {
-                    context.Session.SetString(CartSessionKey, context.User.Identity.Name);
-                }
-                else
-                {
-                    // Generate a new random GUID using System.Guid class
-                    Guid tempCartId = Guid.NewGuid();
-
-                    // Send tempCartId back to client as a cookie
-                    context.Session.SetString(CartSessionKey, tempCartId.ToString());
-                    context.Session.CommitAsync().Wait();
-                }
-            }
-
-            return context.Session.GetString(CartSessionKey);
-        }
     }
 }

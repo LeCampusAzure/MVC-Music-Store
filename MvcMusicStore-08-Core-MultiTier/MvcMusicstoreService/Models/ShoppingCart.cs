@@ -10,35 +10,22 @@ namespace MvcMusicStore.Models
     public partial class ShoppingCart
     {
         MusicStoreEntities storeDB;
-
-        public ShoppingCart(MusicStoreEntities _storeDB)
-        {
-            storeDB = _storeDB;
-        }
-
         string ShoppingCartId { get; set; }
 
 
+        public ShoppingCart(MusicStoreEntities _storeDB, string id)
+        {
+            storeDB = _storeDB;
+            ShoppingCartId = id;
+        }
 
-        //public static ShoppingCart GetCart(HttpContext context, MusicStoreEntities _storeDB)
-        //{
-        //    var cart = new ShoppingCart(_storeDB);
-        //    cart.ShoppingCartId = cart.GetCartId(context);
-        //    return cart;
-        //}
-
-        //// Helper method to simplify shopping cart calls
-        //public static ShoppingCart GetCart(Controller controller, MusicStoreEntities _storeDB)
-        //{
-        //    return GetCart(controller.HttpContext, _storeDB);
-        //}
-
+        
         public void AddToCart(Album album)
         {
             // Get the matching cart and album instances
             var cartItem = storeDB.Carts.SingleOrDefault(
-c => c.CartId == ShoppingCartId
-&& c.AlbumId == album.AlbumId);
+                    c => c.CartId == ShoppingCartId
+                    && c.AlbumId == album.AlbumId);
 
             if (cartItem == null)
             {
@@ -67,8 +54,8 @@ c => c.CartId == ShoppingCartId
         {
             // Get the cart
             var cartItem = storeDB.Carts.Single(
-cart => cart.CartId == ShoppingCartId
-&& cart.RecordId == id);
+                cart => cart.CartId == ShoppingCartId
+                && cart.RecordId == id);
 
             int itemCount = 0;
 
@@ -131,42 +118,43 @@ cart => cart.CartId == ShoppingCartId
             return total ?? decimal.Zero;
         }
 
-        public int CreateOrder(Order order)
-        {
-            decimal orderTotal = 0;
+        //public int CreateOrder(Order order)
+        //{
+        //    decimal orderTotal = 0;
 
-            var cartItems = GetCartItems();
+        //    var cartItems = GetCartItems();
 
-            // Iterate over the items in the cart, adding the order details for each
-            foreach (var item in cartItems)
-            {
-                var orderDetail = new OrderDetail
-                {
-                    AlbumId = item.AlbumId,
-                    OrderId = order.OrderId,
-                    UnitPrice = item.Album.Price,
-                    Quantity = item.Count
-                };
+        //    // Iterate over the items in the cart, adding the order details for each
+        //    foreach (var item in cartItems)
+        //    {
+        //        var orderDetail = new OrderDetail
+        //        {
+        //            AlbumId = item.AlbumId,
+        //            OrderId = order.OrderId,
+        //            UnitPrice = item.Album.Price,
+        //            Quantity = item.Count
+        //        };
 
-                // Set the order total of the shopping cart
-                orderTotal += (item.Count * item.Album.Price);
+        //        // Set the order total of the shopping cart
+        //        orderTotal += (item.Count * item.Album.Price);
 
-                storeDB.OrderDetails.Add(orderDetail);
+        //        storeDB.OrderDetails.Add(orderDetail);
 
-            }
+        //    }
 
-            // Set the order's total to the orderTotal count
-            order.Total = orderTotal;
+        //    // Set the order's total to the orderTotal count
+        //    order.Total = orderTotal;
 
-            // Save the order
-            storeDB.SaveChanges();
+        //    // Save the order
+        //    storeDB.SaveChanges();
 
-            // Empty the shopping cart
-            EmptyCart();
+        //    // Empty the shopping cart
+        //    EmptyCart();
 
-            // Return the OrderId as the confirmation number
-            return order.OrderId;
-        }
+        //    // Return the OrderId as the confirmation number
+        //    return order.OrderId;
+        //}
+
 
        
 

@@ -16,12 +16,37 @@ namespace MvcMusicStore.ViewComponents
 
         public CartSummaryViewComponent(IConfiguration _config)
         {
-            apiHelper = new ApiHelper(_config);
+            apiHelper = new ApiHelper(_config.GetValue<string>("Services:MvcMusicStoreService"));
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            ViewData["CartCount"] = await apiHelper.GetAsync<int>("/api/ShoppingCart/Count");
+            var cart = new ShoppingCartHelper(this.HttpContext);
+            var cartId = cart.GetCartId();
+            int cartCount = await apiHelper.GetAsync<int>("/api/ShoppingCart/Count?id=" + cartId);
+            if (this.HttpContext.User.Identity.IsAuthenticated)
+            {
+                string userName = new ContextHelper().GetUsernameFromClaims(this.HttpContext);
+
+                int userCartCount = await apiHelper.GetAsync<int>("/api/ShoppingCart/Count?id=" + userName);
+                if (userName != cartId && userCartCount == 0)
+                {
+                    CartMigration migration = new CartMigration()
+                    {
+                        SourceCartId = cartId,
+                        DestCartId = userName
+                    };
+                    await apiHelper.PostAsync<CartMigration>("/api/ShoppingCart/MigrateCart", migration);
+                    cartCount = userCartCount;
+                }
+                if (cartId != userName)
+                {
+                    cart.SetCartId(userName);
+                    cartCount = await apiHelper.GetAsync<int>("/api/ShoppingCart/Count?id=" + userName);
+                }
+            }
+
+            ViewData["CartCount"] = cartCount;
             return View();
         }
     }

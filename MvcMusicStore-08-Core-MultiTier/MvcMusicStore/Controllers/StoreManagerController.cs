@@ -23,7 +23,7 @@ namespace MvcMusicStore.Controllers
 
         public StoreManagerController(IConfiguration _config, IDistributedCache _distributedCache)
         {
-            apiHelper = new ApiHelper(_config);
+            apiHelper = new ApiHelper(_config.GetValue<string>("Services:MvcMusicStoreService"));
             cache = _distributedCache;
         }
         //
