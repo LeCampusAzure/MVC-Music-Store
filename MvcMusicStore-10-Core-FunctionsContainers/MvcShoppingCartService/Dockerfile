@@ -6,9 +6,9 @@ EXPOSE 80
 FROM microsoft/dotnet:2.1-sdk AS build
 RUN ls -R
 WORKDIR /src
-RUN ls -R
-COPY . ./
-RUN ls -R
+COPY ["MvcShoppingCartService/MvcShoppingCartService.csproj", "MvcShoppingCartService/"]
+RUN dotnet restore "$csproj"
+COPY . .
 WORKDIR "/src/MvcShoppingCartService"
 RUN dotnet restore "MvcShoppingCartService.csproj"
 RUN dotnet build "MvcShoppingCartService.csproj" -c Release
