@@ -28,7 +28,7 @@
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,
-      "launchUrl": "{Scheme}://localhost:{ServicePort}/api/values"
+      "launchUrl": "{Scheme}://localhost:{ServicePort}/api/shoppingcart/count?id=1"
     }
   }
 }

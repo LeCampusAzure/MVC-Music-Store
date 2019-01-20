@@ -8,7 +8,7 @@ FROM microsoft/dotnet:2.1-sdk AS build
 WORKDIR /src
 COPY . ./
 WORKDIR "/src/MvcShoppingCartService"
-RUN pwd
+RUN ls -R
 RUN dotnet restore "MvcShoppingCartService.csproj"
 RUN dotnet build "MvcShoppingCartService.csproj" -c Release
 RUN dotnet publish "MvcShoppingCartService.csproj" -c Release -o /app
