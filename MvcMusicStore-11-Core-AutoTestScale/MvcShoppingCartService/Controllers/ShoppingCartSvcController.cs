@@ -40,8 +40,12 @@ namespace MvcMusicstoreService.Controllers
             return new ShoppingCart(storeDB, id).GetCount();
         }
 
-        //
-     
+        // GET: /ShoppingCart/Probe
+        [HttpGet]
+        public ActionResult<string> Probe()
+        {
+            return "Probe OK";
+        }
 
         [HttpPost]
         public ActionResult MigrateCart(CartMigration cartMigration)

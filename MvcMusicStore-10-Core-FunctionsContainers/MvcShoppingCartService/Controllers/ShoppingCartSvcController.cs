@@ -48,15 +48,6 @@ namespace MvcMusicstoreService.Controllers
             return Ok();
         }
 
-        // GET: /ShoppingCart/Probe
-        [HttpGet]
-        public ActionResult<string> Probe()
-        {
-            return "Probe OK";
-        }
-
-
-
         // GET: /Store/AddToCart/5
         [HttpPost]
         public ActionResult AddToCart(Cart cart)
