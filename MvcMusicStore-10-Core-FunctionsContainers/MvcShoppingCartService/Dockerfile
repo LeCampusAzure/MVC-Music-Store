@@ -3,9 +3,10 @@ WORKDIR /app
 EXPOSE 80
 
 FROM microsoft/dotnet:2.1-sdk AS build
+ARG csproj="MvcShoppingCartService/MvcShoppingCartService.csproj"
 WORKDIR /src
-COPY ["MvcShoppingCartService/MvcShoppingCartService.csproj", "MvcShoppingCartService/"]
-RUN dotnet restore "MvcShoppingCartService/MvcShoppingCartService.csproj"
+COPY [$csproj, "MvcShoppingCartService/"]
+RUN dotnet restore $csproj
 COPY . .
 WORKDIR "/src/MvcShoppingCartService"
 RUN dotnet build "MvcShoppingCartService.csproj" -c Release -o /app
