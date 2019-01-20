@@ -39,8 +39,6 @@ namespace MvcMusicstoreService.Controllers
         {
             return new ShoppingCart(storeDB, id).GetCount();
         }
-
-        //
      
 
         [HttpPost]
@@ -49,6 +47,15 @@ namespace MvcMusicstoreService.Controllers
             new ShoppingCart(storeDB, cartMigration.SourceCartId).MigrateCart(cartMigration.DestCartId);
             return Ok();
         }
+
+        // GET: /ShoppingCart/Probe
+        [HttpGet]
+        public ActionResult<string> Probe()
+        {
+            return "Probe OK";
+        }
+
+
 
         // GET: /Store/AddToCart/5
         [HttpPost]
