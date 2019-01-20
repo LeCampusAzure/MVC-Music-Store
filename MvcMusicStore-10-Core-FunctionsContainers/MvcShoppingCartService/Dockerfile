@@ -4,7 +4,7 @@ EXPOSE 80
 
 # dotnet commands to build, test, and publish
 FROM microsoft/dotnet:2.1-sdk AS build
-#ARG csproj="MvcShoppingCartService.csproj"
+RUN ls -R
 WORKDIR /src
 RUN ls -R
 COPY . ./
